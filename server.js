@@ -21,9 +21,7 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-
-});
+server.listen(PORT, () => {});
 
 const page = async (filePath, res) => {
   const data = await fs.readFile(filePath);
