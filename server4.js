@@ -1,26 +1,24 @@
 import { createServer } from 'node:http';
-import {createTable, insertData, queryData} from './connect.js'
-//import users from './db.js';
+import { createTable, insertData, getAll, get } from './connect.js'
 
 const PORT = process.env.PORT;
 
 const server = createServer((req, res) => {
   //createTable();
   //insertData();
-  const users = queryData();
 
   loggerMiddleware(req, res, () => {
     const url = req.url;
     const METHOD = req.method;
     const urlMETHOD = url + METHOD;
-    const id = parseInt(url.slice(5));
-
+    const id = url.slice(11);
     if (urlMETHOD.match(/\/api\/usersGET/)) {
-      send(res, users, 200);
-    } else if (urlMETHOD.match(/\/api\/[0-9]+GET/) && users.find(user => user.id === id)) {
-      send(res, users.filter(user => user.id === id), 200);
+      const users = getAll();
+      users !== undefined && users !== null ? send(res, users, 200) : send(res, { message: 'not found' }, 404);
+    } else if (urlMETHOD.match(/\/api\/users:[0-9]+GET/)) {
+      const user = get(id);
+      user !== undefined && user !== null ? send(res, user, 200) : send(res, { message: 'not found' }, 404);
     }
-
     else {
       send(res, { message: 'not found' }, 404);
     }

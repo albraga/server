@@ -26,11 +26,15 @@ export const insertData = () => {
   insert.run(10, 'dez');
 };
 
-export const queryData = () => {
+export const getAll = () => {
   const query = database.prepare('SELECT * FROM data ORDER BY id');
   return query.all();
 };
 
+export const get = id => {
+  const query = database.prepare(`SELECT * FROM data WHERE id=${id}`);
+  return null;
+};
 
 
 
