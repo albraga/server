@@ -1,23 +1,18 @@
 import { createServer } from 'node:http';
+import users from './db.js';
 
 const PORT = process.env.PORT;
-
-const users = [
-  { id: 1, title: 'um' },
-  { id: 2, title: 'dois' },
-  { id: 3, title: 'três' },
-];
 
 const server = createServer((req, res) => {
   const url = req.url;
   const METHOD = req.method;
   const urlMETHOD = url + METHOD;
-  const id = url.slice(5);
+  const id = parseInt(url.slice(5));
 
   if (urlMETHOD.match(/\/api\/usersGET/)) {
     send(res, users, 200);
-  } else if (urlMETHOD.match(/\/api\/[0-9]GET/)) {
-    send(res, users.filter(user => user.id === parseInt(id)), 200);
+  } else if (urlMETHOD.match(/\/api\/[0-9]+GET/) && users.find(user => user.id === id)) {
+    send(res, users.filter(user => user.id === id), 200);
   }
 
   else {

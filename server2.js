@@ -1,12 +1,7 @@
 import { createServer } from 'node:http';
+import users from './db.js';
 
 const PORT = process.env.PORT;
-
-const users = [
-  { id: 1, title: 'um' },
-  { id: 2, title: 'dois' },
-  { id: 3, title: 'três' },
-];
 
 const server = createServer((req, res) => {
   const url = req.url;
