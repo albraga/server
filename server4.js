@@ -1,31 +1,43 @@
 import { createServer } from 'node:http';
-import { createTable, insertData, getAll, get } from './connect.js'
+import { createTable, insertData, getUsers, getUser } from './connect.js'
 
 const PORT = process.env.PORT;
 
 const server = createServer((req, res) => {
-  //createTable();
-  //insertData();
+  const method = req.method;
+  switch(method) {
+    case 'GET' :
+      read(req, res);
+      break;
+      case 'PUT' :
+      break;
+      case 'POST' :
+      break;
+      case 'DELETE' :
+      break;
+      default:
+        send(res, { message: 'not found' }, 404)
+  }
+});
 
-  loggerMiddleware(req, res, () => {
+const read = (req, res) => {
+    loggerMiddleware(req, res, () => {
     const url = req.url;
     const METHOD = req.method;
     const urlMETHOD = url + METHOD;
     const id = url.slice(11);
     if (urlMETHOD.match(/\/api\/usersGET/)) {
-      const users = getAll();
-      users !== undefined && users !== null ? send(res, users, 200) : send(res, { message: 'not found' }, 404);
+      const users = getUsers();
+      users !== undefined && users !== null ? send(res, users, 200) : send(res, { message: 'users not found' }, 404);
     } else if (urlMETHOD.match(/\/api\/users:[0-9]+GET/)) {
-      const user = get(id);
-      user !== undefined && user !== null ? send(res, user, 200) : send(res, { message: 'not found' }, 404);
+      const user = getUser(id);
+      user !== undefined && user !== null ? send(res, user, 200) : send(res, { message: `${id} not found`}, 404);
     }
     else {
       send(res, { message: 'not found' }, 404);
     }
-
   });
-
-});
+  };
 
 const loggerMiddleware = (req, res, next) => {
   console.log(`${req.method} ${req.url}`);
