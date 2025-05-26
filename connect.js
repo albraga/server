@@ -26,9 +26,9 @@ export const insertData = () => {
   insert.run(10, 'dez');
 };
 
-export const createUser = (id, title) => {
+export const createUser = (newUser) => {
   const insert = database.prepare('INSERT INTO data (id, title) VALUES (?, ?)');
-  insert.run(id, title);
+  insert.run(newUser.id, newUser.title);
 };
 
 export const getUsers = () => {

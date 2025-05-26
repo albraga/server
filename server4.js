@@ -7,10 +7,10 @@ const server = createServer((req, res) => {
   const method = req.method;
   switch (method) {
     case 'GET':
-      read(req, res);
+      readHandler(req, res);
       break;
     case 'POST':
-      create(req, res);
+      createHandler(req, res);
       break;
     case 'PUTT':
       break;
@@ -21,11 +21,21 @@ const server = createServer((req, res) => {
   }
 });
 
-const create = (req, res) => {
+const createHandler = (req, res) => {
   loggerMiddleware(req, res, () => {
     urlMethodMiddleware(req, res, (urlMETHOD, URLuser) => {
-      if (urlMETHOD.match(/\/api\/users:[0-9]+:[a-z]+POST/)) {
-        createUser(URLuser.id,URLuser.title);
+      if (urlMETHOD.match(/\/api\/usersPOST/)) {
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk.toString();
+        });
+          req.on('end', () => {
+          const newUser = JSON.parse(body);
+          createUser(newUser);
+          res.statusCode = 201;
+          res.write(JSON.stringify(newUser));
+          res.end();
+        }); 
       }
       else {
         send(res, { message: 'not found' }, 404);
@@ -36,7 +46,7 @@ const create = (req, res) => {
 
 
 
-const read = (req, res) => {
+const readHandler = (req, res) => {
   loggerMiddleware(req, res, () => {
     urlMethodMiddleware(req, res, (urlMETHOD, URLuser) => {
       if (urlMETHOD.match(/\/api\/usersGET/)) {
