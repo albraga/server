@@ -26,6 +26,11 @@ export const insertData = () => {
   insert.run(10, 'dez');
 };
 
+export const createUser = (id, title) => {
+  const insert = database.prepare('INSERT INTO data (id, title) VALUES (?, ?)');
+  insert.run(id, title);
+};
+
 export const getUsers = () => {
   const query = database.prepare('SELECT * FROM data ORDER BY id');
   return query.all();
