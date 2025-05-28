@@ -26,6 +26,16 @@ export const insertData = () => {
   insert.run(10, 'dez');
 };
 
+export const deleteUser = (id) => {
+  const update = database.prepare('DELETE FROM data WHERE id = ?');
+  update.run(id);
+};
+
+export const updateUser = (user) => {
+  const update = database.prepare('UPDATE data SET title = ? WHERE id = ?');
+  update.run(user.title, user.id);
+};
+
 export const createUser = (newUser) => {
   const insert = database.prepare('INSERT INTO data (id, title) VALUES (?, ?)');
   insert.run(newUser.id, newUser.title);

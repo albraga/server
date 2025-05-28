@@ -1,5 +1,5 @@
 import { createServer } from 'node:http';
-import {getUsers, getUser, createUser} from './connect.js'
+import { getUsers, getUser, createUser, updateUser, deleteUser } from './connect.js'
 
 const PORT = process.env.PORT;
 
@@ -12,15 +12,62 @@ const server = createServer((req, res) => {
     case 'POST':
       createHandler(req, res);
       break;
-    case 'PUTT':
+    case 'PUT':
+      updateHandler(req, res);
       break;
     case 'DELETE':
+      deleteHandler(req, res);
       break;
     default:
       send(res, { message: 'not found' }, 404)
   }
 });
 
+const deleteHandler = (req, res) => {
+  loggerMiddleware(req, res, () => {
+    urlMethodMiddleware(req, res, (urlMETHOD, URLuser) => {
+      if (urlMETHOD.match(/\/api\/usersDELETE/)) {
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk.toString();
+        });
+        req.on('end', () => {
+          const newUser = JSON.parse(body);
+          deleteUser(newUser.id);
+          res.statusCode = 201;
+          res.write(JSON.stringify(newUser));
+          res.end();
+        });
+      }
+      else {
+        send(res, { message: 'not found' }, 404);
+      }
+    });
+  });
+};
+
+const updateHandler = (req, res) => {
+  loggerMiddleware(req, res, () => {
+    urlMethodMiddleware(req, res, (urlMETHOD, URLuser) => {
+      if (urlMETHOD.match(/\/api\/usersPUT/)) {
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk.toString();
+        });
+        req.on('end', () => {
+          const newUser = JSON.parse(body);
+          updateUser(newUser);
+          res.statusCode = 201;
+          res.write(JSON.stringify(newUser));
+          res.end();
+        });
+      }
+      else {
+        send(res, { message: 'not found' }, 404);
+      }
+    });
+  });
+};
 const createHandler = (req, res) => {
   loggerMiddleware(req, res, () => {
     urlMethodMiddleware(req, res, (urlMETHOD, URLuser) => {
@@ -29,13 +76,13 @@ const createHandler = (req, res) => {
         req.on('data', (chunk) => {
           body += chunk.toString();
         });
-          req.on('end', () => {
+        req.on('end', () => {
           const newUser = JSON.parse(body);
           createUser(newUser);
           res.statusCode = 201;
           res.write(JSON.stringify(newUser));
           res.end();
-        }); 
+        });
       }
       else {
         send(res, { message: 'not found' }, 404);
@@ -71,7 +118,7 @@ const urlMethodMiddleware = (req, res, next) => {
   const idTitle = url.slice(11).split(':');
   const id = idTitle[0];
   const title = idTitle[1];
-  const URLuser = {id, title}
+  const URLuser = { id, title }
   next(urlMETHOD, URLuser);
 }
 
