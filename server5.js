@@ -7,10 +7,7 @@ const server = createServer((req, res) => {
   const method = req.method;
   switch (method) {
     case 'GET':
-      readHandler(req, res);
-      break;
-    case 'POST':
-      createHandler(req, res);
+      readOrCreateHandler(req, res);
       break;
     case 'PUT':
       updateHandler(req, res);
@@ -68,45 +65,8 @@ const updateHandler = (req, res) => {
     });
   });
 };
-const createHandler = (req, res) => {
-  loggerMiddleware(req, res, () => {
-    urlMethodMiddleware(req, res, (urlMETHOD, URLuser) => {
-      if (urlMETHOD.match(/\/api\/usersPOST/)) {
-        let body = '';
-        req.on('data', (chunk) => {
-          body += chunk.toString();const data = {
-  id: 15,
-  title: 'quinze'
-};
 
-const settings = {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(data)
-};
-
-fetch('http://localhost:8787/api/users', settings).catch(console.error); 
-        });
-        req.on('end', () => {
-          const newUser = JSON.parse(body);
-          createUser(newUser);
-          res.statusCode = 201;
-          res.write(JSON.stringify(newUser));
-          res.end();
-        });
-      }
-      else {
-        send(res, { message: 'not found' }, 404);
-      }
-    });
-  });
-};
-
-
-
-const readHandler = (req, res) => {
+const readOrCreateHandler = (req, res) => {
   loggerMiddleware(req, res, () => {
     urlMethodMiddleware(req, res, (urlMETHOD, URLuser) => {
       if (urlMETHOD.match(/\/api\/usersGET/)) {
@@ -115,6 +75,10 @@ const readHandler = (req, res) => {
       } else if (urlMETHOD.match(/\/api\/users:[0-9]+GET/)) {
         const user = getUser(URLuser.id);
         user !== undefined && user !== null ? send(res, user, 200) : send(res, { message: `${id} not found` }, 404);
+      }
+      else if (urlMETHOD.match(/\/api\/users:[0-9]+:[a-z]+GET/)) {
+        createUser(URLuser);
+        send(res, URLuser, 200);
       }
       else {
         send(res, { message: 'not found' }, 404);
